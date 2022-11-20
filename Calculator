@@ -1,12 +1,9 @@
-package mycalculator;
-
-//import java.util.InputMismatchException;
+import java.util.InputMismatchException;
 import java.io.IOException;
-                             //=====================================================================================================
-import java.io.IOException;  //
-import java.util.Arrays;     // Вопрос. Почему результат в выводе на консоли дублируется (Дублируется значение как при вводе).
-import java.util.List;       //
-import java.util.Scanner;    //=====================================================================================================
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
 
 public class Main {
     static Scanner scanner = new Scanner(System.in);
@@ -15,22 +12,19 @@ public class Main {
     static String[] regexActions = {"\\+", "-", "/", "\\*"};
     static int a, b;
     static int result;
-    static boolean contains1;
-    static boolean contains2;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
         System.out.print("Введите выражение: ");
-        String userInput = scanner.nextLine();
-        System.out.println(calc(userInput));
-
-
+        String input = scanner.nextLine();
+        System.out.println(calc(input));
+        System.exit(0);
     }
 
-    public static String calc(String userInput) {
+    public static String calc(String input) {
 
         for (int i = 0; i < actions.length; i++) {
-            if (userInput.contains(actions[i])) {
+            if (input.contains(actions[i])) {
                 actionIndex = i;
                 break;
             }
@@ -38,48 +32,62 @@ public class Main {
 
         if (actionIndex == -1) {
             try {
-                throw new IOException();
-            } catch (IOException e) {
+                throw new InputMismatchException();
+            } catch (InputMismatchException e) {
                 System.out.println("throws Exception //т.к. строка не является математической операцией");
             }
-
+            System.exit(0);
         }
 
-        List list = Arrays.asList("I", "II", "III", "IV", "V", "VI", "VII", "VII", "VIII", "XI", "X");
-        String[] separation = userInput.split(regexActions[actionIndex]);
+        List<String> list = Arrays.asList("I", "II", "III", "IV", "V", "VI", "VII", "VII", "VIII", "IX", "X");
+        String[] separation = input.split(regexActions[actionIndex]);
         if (list.contains(separation[0]) == list.contains(separation[1])) {
             for (int i = 0; i < separation.length; i++) {
                 if (i == 2) {
                     try {
-                        throw new IOException();
-                    } catch (IOException e) {
+                        throw new InputMismatchException();
+                    } catch (InputMismatchException e) {
                         System.out.println("throws Exception //т.к. формат математической операции не удовлетворяет заданию - два операнда и один оператор (+, -, /, *)");
                     }
-
+                    System.exit(0);
                 }
             }
-            contains1 = list.contains(separation[0]);
-            contains2 = list.contains(separation[1]);
-            if (list.contains(separation[0]) == false || list.contains(separation[1]) == false) {
+
+            if (!list.contains(separation[0]) || !list.contains(separation[1])) {
 
                 a = Integer.parseInt(separation[0]);
                 b = Integer.parseInt(separation[1]);
-
+                if (a > 10 || b > 10 || a < -10 || b < -10) {
+                    try {
+                        throw new IOException();
+                    } catch (IOException e) {
+                        System.out.println("throws Exception //т.к. одно или два из введенных значений больше 10 или меньше -10");
+                    }
+                    System.exit(0);
+                }
                 switch (actions[actionIndex]) {
                     case "+" -> result = a + b;
                     case "-" -> result = a - b;
                     case "*" -> result = a * b;
                     default -> result = a / b;
                 }
-                System.out.println(result);
-
+                int x = result;
+                input = Integer.toString(x);
             }
 
-            if (list.contains(separation[0]) == true && list.contains(separation[1]) == true) {
+            if (list.contains(separation[0]) && list.contains(separation[1])) {
                 String numberA = separation[0];
                 String numberB = separation[1];
                 a = romanToInt(numberA);
                 b = romanToInt(numberB);
+                if (a > 10 || b > 10) {
+                    try {
+                        throw new IOException();
+                    } catch (IOException e) {
+                        System.out.println("throws Exception //т.к. одно или два из введенных значений больше X");
+                    }
+                    System.exit(0);
+                }
                 switch (actions[actionIndex]) {
                     case "+" -> result = a + b;
                     case "-" -> result = a - b;
@@ -88,28 +96,32 @@ public class Main {
                 }
                 if (result < 0) {
                     try {
-                        throw new IOException();
-                    } catch (IOException e) {
+                        throw new ArithmeticException();
+                    } catch (ArithmeticException | InputMismatchException e) {
                         System.out.println("throws Exception //т.к. в римской системе нет отрицательных чисел");
                     }
-
+                    System.exit(0);
                 }
                 int x = result;
                 int units = x % 10;
                 int tens = (x % 100) / 10;
                 int hundreds = (x % 1000) / 100;
-
-                System.out.println(Hundreds(hundreds) + Tens(tens) + Units(units));
+                String str1 = Hundreds(hundreds);
+                String str2 = Tens(tens);
+                String str3 = Units(units);
+//                input = String.join(str1, str2, str3);
+                input = str1.concat(str2).concat(str3);
             }
 
         } else {
             try {
-                throw new IOException();
-            } catch (IOException e) {
-                System.out.println("throws Exception //т.к. используются одновременно разные системы счисления");
+                throw new InputMismatchException();
+            } catch (InputMismatchException e) {
+                System.out.println("throws Exception //т.к. используются одновременно разные системы счисления, а так же римское значение не может быть отрицательным");
             }
+            System.exit(0);
         }
-        return userInput;
+        return input;
     }
 
     public static int getArabian(char roman) {
